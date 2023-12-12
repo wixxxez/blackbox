@@ -27,7 +27,7 @@ dp = Router()
 bot = Bot(f"{token}")
 
 WEBHOOK_PATH = f"/bot/{token}"
-TUNNEL_URL = "https://4210-38-180-114-16.ngrok-free.app"
+TUNNEL_URL = "https://6bad-38-180-114-16.ngrok-free.app"
 WEBHOOK_URL = f"{TUNNEL_URL}{WEBHOOK_PATH}"
 pages = open("pages.txt", 'r')
 pages = pages.readlines()
@@ -212,7 +212,7 @@ async def handle_document(message: types.File):
     number_of_files = count_files_in_directory('./user_input')
     # Save the file to the specified directory
     base_name = os.path.splitext(message.document.file_name)[0]
-    save_path = f"user_input/{base_name}_f{ number_of_files+ 1}"
+    save_path = f"./user_input/{base_name}_f{ number_of_files+ 1}"
     await bot.download_file(file_path, save_path) 
     existing_file_path = save_path # Replace with the actual path to your existing file
 
@@ -234,7 +234,8 @@ async def handle_document(message: types.File):
         website = ss.website
         check_service = CheckManager.CheckForUniqRowsService(data, website)
         rows , duplicates= check_service.getUniqRows()
-    except Exception:
+    except Exception as e:
+        print(e)
         await message.reply('Неверный формат файла.')
         return
     db = DatabaseManager()

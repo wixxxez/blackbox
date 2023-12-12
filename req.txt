@@ -9,3 +9,4 @@ python-json-logger==2.0.4
 aiohttp==3.8.6
 SQLAlchemy==1.4.45
 pandas==1.5.2
+openpyxl==3.0.10
