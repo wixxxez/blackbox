@@ -27,7 +27,7 @@ dp = Router()
 bot = Bot(f"{token}")
 
 WEBHOOK_PATH = f"/bot/{token}"
-TUNNEL_URL = "http://38.180.114.16/"
+TUNNEL_URL = "https://9502-38-180-114-16.ngrok-free.app"
 WEBHOOK_URL = f"{TUNNEL_URL}{WEBHOOK_PATH}"
 pages = open("pages.txt", 'r')
 pages = pages.readlines()
@@ -82,7 +82,7 @@ def main() -> None:
     setup_application(app, dispatcher, bot=bot)
 
     # And finally start webserver
-    web.run_app(app, host= "127.0.0.1", port=80)
+    web.run_app(app, host= "0.0.0.0", port=8000)
 
     
  
