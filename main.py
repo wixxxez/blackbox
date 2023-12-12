@@ -27,7 +27,7 @@ dp = Router()
 bot = Bot(f"{token}")
 
 WEBHOOK_PATH = f"/bot/{token}"
-TUNNEL_URL = "https://570e-5-58-51-223.ngrok-free.app"
+TUNNEL_URL = "http://38.180.114.16/"
 WEBHOOK_URL = f"{TUNNEL_URL}{WEBHOOK_PATH}"
 pages = open("pages.txt", 'r')
 pages = pages.readlines()
