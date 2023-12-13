@@ -22,7 +22,7 @@ from aiohttp import web
 
 token =  config.TOKEN
 
-dp = Router()
+dp = Dispatcher()
 
 bot = Bot(f"{token}")
 
@@ -43,46 +43,47 @@ for i in pages:
 #buttons_label = np.reshape(web_pages,(1,-1)).tolist()
 sublists = [web_pages[i:i + 3] for i in range(0, len(web_pages), 3)]
 
-async def on_startup():
-    webhook_info = await bot.get_webhook_info()
+# async def on_startup():
+#     webhook_info = await bot.get_webhook_info()
      
 
-    if webhook_info.url != WEBHOOK_URL:
-        await bot.set_webhook(
-            url=WEBHOOK_URL
-        )
+#     if webhook_info.url != WEBHOOK_URL:
+#         await bot.set_webhook(
+#             url=WEBHOOK_URL
+#         )
     
-def main() -> None:
-    # Dispatcher is a root router
-     
-    dispatcher = Dispatcher()
-    # ... and all other routers should be attached to Dispatcher
-    dispatcher.include_router(dp)
+async def main() -> None:
+#     # Dispatcher is a root router
+    await dp.start_polling(bot)
 
-    # Register startup hook to initialize webhook
-    dispatcher.startup.register(on_startup)
+#     dispatcher = Dispatcher()
+#     # ... and all other routers should be attached to Dispatcher
+#     dispatcher.include_router(dp)
 
-    # Initialize Bot instance with a default parse mode which will be passed to all API calls
-    bot = Bot(token, parse_mode=ParseMode.HTML)
+#     # Register startup hook to initialize webhook
+#     dispatcher.startup.register(on_startup)
 
-    # Create aiohttp.web.Application instance
-    app = web.Application()
+#     # Initialize Bot instance with a default parse mode which will be passed to all API calls
+#     bot = Bot(token, parse_mode=ParseMode.HTML)
 
-    # Create an instance of request handler,
-    # aiogram has few implementations for different cases of usage
-    # In this example we use SimpleRequestHandler which is designed to handle simple cases
-    webhook_requests_handler = SimpleRequestHandler(
-        dispatcher=dispatcher,
-        bot=bot,
-    )
-    # Register webhook handler on application
-    webhook_requests_handler.register(app, path=WEBHOOK_PATH)
+#     # Create aiohttp.web.Application instance
+#     app = web.Application()
 
-    # Mount dispatcher startup and shutdown hooks to aiohttp application
-    setup_application(app, dispatcher, bot=bot)
+#     # Create an instance of request handler,
+#     # aiogram has few implementations for different cases of usage
+#     # In this example we use SimpleRequestHandler which is designed to handle simple cases
+#     webhook_requests_handler = SimpleRequestHandler(
+#         dispatcher=dispatcher,
+#         bot=bot,
+#     )
+#     # Register webhook handler on application
+#     webhook_requests_handler.register(app, path=WEBHOOK_PATH)
 
-    # And finally start webserver
-    web.run_app(app, host= "0.0.0.0", port=8000)
+#     # Mount dispatcher startup and shutdown hooks to aiohttp application
+#     setup_application(app, dispatcher, bot=bot)
+
+#     # And finally start webserver
+#     web.run_app(app, host= "0.0.0.0", port=8000)
 
     
  
@@ -151,7 +152,7 @@ async def pages(message: types.Message):
     builder = InlineKeyboardBuilder()
     builder.button(text= "🧠Инструкция🧠", url= "https://pl.wikipedia.org/wiki/Jan_Pawe%C5%82_II")
     await message.answer(text= "📎Отлично, теперь выберите запрос:\n\n <b>ПРЕЖДЕ ЧЕМ ГРУЗИТЬ ЧИТАЙТЕ ИНСТРУКЦИЮ</b>",reply_markup=builder.as_markup(), parse_mode= ParseMode.HTML)
-    await message.answer(text= "🔎Выберите запрос🔎", reply_markup= keyboard.as_markup(resize_keyboard = True))
+    await message.answer(text= "🔎Выберите запрос🔎", reply_markup= keyboard.as_markup(resize_keyboard = True, one_time_keyboard = True))
 
 @dp.message(F.text == "Назад")
 async def back_to_work_nigga(message: types.Message):
