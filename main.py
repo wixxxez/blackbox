@@ -43,17 +43,18 @@ for i in pages:
 #buttons_label = np.reshape(web_pages,(1,-1)).tolist()
 sublists = [web_pages[i:i + 3] for i in range(0, len(web_pages), 3)]
 
-# async def on_startup():
-#     webhook_info = await bot.get_webhook_info()
+async def on_startup():
+    webhook_info = await bot.get_webhook_info()
      
 
-#     if webhook_info.url != WEBHOOK_URL:
-#         await bot.set_webhook(
-#             url=WEBHOOK_URL
-#         )
+    if webhook_info.url != WEBHOOK_URL:
+        await bot.set_webhook(
+            url=WEBHOOK_URL
+        )
     
 async def main() -> None:
-#     # Dispatcher is a root router
+#     # Dispatcher is a root route
+    await bot.delete_webhook()
     await dp.start_polling(bot)
 
 #     dispatcher = Dispatcher()
