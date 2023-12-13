@@ -19,10 +19,11 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 import requests as req
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
-
+from Security import BannedUserMiddleware
 token =  config.TOKEN
 
 dp = Dispatcher()
+dp.message.middleware(BannedUserMiddleware())
 
 bot = Bot(f"{token}")
 
@@ -234,7 +235,9 @@ async def handle_document(message: types.File):
         reader = ReadFileService.FileProcessorFacade()
         data = reader.process_file(new_file_name)    
         website = ss.website
-        check_service = CheckManager.CheckForUniqRowsService(data, website)
+        
+        check_service = CheckManager.CheckForUniqRowsService(user_file=data, website=ss.website,file_path= new_file_name)
+        
         rows , duplicates= check_service.getUniqRows()
     except Exception as e:
         print(e)
@@ -244,7 +247,7 @@ async def handle_document(message: types.File):
     
     file_id = db.insert_event(message.from_user.id, new_file_name, "Waited")
     ss.sending_file = False
-    await AdminsMessage(bot=bot).send_message(rows,file_id,new_file_name,website,message.from_user.id)
+    await AdminsMessage(bot=bot).send_message(rows,file_id,new_file_name,website,message.from_user.id, message.from_user.username)
     
     await message.reply('⌛️ Ожидайте сейчас наш бот проверит строки на уникальность.')
     await message.reply(f"👑 Файл - # {file_id} был загружен 👑.\n\n\n✅ Уникальных строк. {rows}.\n❌ Повторений: {duplicates}.\n⚠️ Совпадений с базой: {duplicates}")
@@ -270,13 +273,49 @@ async def revieve_balance(call):
 
     
     await bot.send_message(call.from_user.id,  f"Введите команду  ```\n /set_balance {file_id}:баланс ``` ", parse_mode=ParseMode.MARKDOWN)
+
+@dp.message(Command('ban'))
+async def ban_user(message: types.Message):
+
     
+    if str(message.from_user.id) not in config.RECEPIENT_ID:
+        
+        await bot.send_message(text="Нету прав администратора", chat_id=message.from_user.id) 
+        return
+    username_to_ban = message.text.replace("/ban ", '')
+    username_to_ban = username_to_ban.replace("@",'')
+    if username_to_ban:
+        with open('banned_users.txt', 'a') as f:
+            f.write(f"{username_to_ban}\n")
+        await message.reply(f"User {username_to_ban} has been banned.")
+    else:
+        await message.reply("Please provide a username to ban. Usage: /ban @username")
+@dp.message(Command('unban'))
+async def unban_user(message: types.Message):
+
+    username_to_unban = message.text.replace("/unban ", '')
+    username_to_unban = username_to_unban.replace("@",'')
+    if str(message.from_user.id) not in config.RECEPIENT_ID:
+        
+        await bot.send_message(text="Нету прав администратора", chat_id=message.from_user.id) 
+        return
+    if username_to_unban:
+        with open('banned_users.txt', 'r') as f:
+            lines = f.readlines()
+        with open('banned_users.txt', 'w') as f:
+            for line in lines:
+                if line.strip() != username_to_unban:
+                    f.write(line)
+        await message.reply(f"User {username_to_unban} has been unbanned.")
+    else:
+        await message.reply("Please provide a username to unban. Usage: /unban @username")
+        
 @dp.message(Command('set_balance'))
 async def handle_balance(message: types.Message):
     
     db = DatabaseManager()
-    
-    if str(message.from_user.id) != str(config.RECEPIENT_ID):
+     
+    if str(message.from_user.id) not in config.RECEPIENT_ID:
         
         await bot.send_message(text="Нету прав администратора", chat_id=message.from_user.id) 
         return

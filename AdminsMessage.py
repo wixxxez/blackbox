@@ -10,14 +10,15 @@ class AdminsMessage():
         self.bot = bot
     
     
-    async def send_message(self, numrows, file_id, file_path, website, recepient_id):
+    async def send_message(self, numrows, file_id, file_path, website, recepient_id, username):
 
         builder = InlineKeyboardBuilder()
      
         builder.button(text= "Оповестить ⌛️", callback_data= f'{recepient_id}NOTIFY')
         laba_name = FSInputFile(f"{file_path}")
          
-        await self.bot.send_document(RECEPIENT_ID,laba_name, caption = f"Совпадений: {numrows}\n Запрос: {website} \nFile_id: {file_id}", reply_markup = builder.as_markup(),  parse_mode = ParseMode.HTML)    
+        for admin in RECEPIENT_ID:
+            await self.bot.send_document(admin,laba_name, caption = f"Username: {username} \nСовпадений: {numrows}\nЗапрос: {website} \nFile_id: {file_id}", reply_markup = builder.as_markup(),  parse_mode = ParseMode.HTML)    
         
         return -1 
         
@@ -30,7 +31,9 @@ class AdminsMessage():
         payment_system = dict["Система выплаты"]
         amount = dict['Сумма']
         rec = dict['Реквизиты']
-        await self.bot.send_message(chat_id = RECEPIENT_ID,text= f'Система выплаты: {payment_system},\nСумма: {amount},\nРеквизиты:{rec}', reply_markup = builder.as_markup(), parse_mode = ParseMode.HTML )
+        for admin in RECEPIENT_ID:
+            
+            await self.bot.send_message(chat_id = admin,text= f'Система выплаты: {payment_system},\nСумма: {amount},\nРеквизиты:{rec}', reply_markup = builder.as_markup(), parse_mode = ParseMode.HTML )
         
         
         
