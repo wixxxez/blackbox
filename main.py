@@ -110,7 +110,7 @@ async def start(message: types.Message):
 
 @dp.message(F.text == "🧠Инструкция🧠")
 async def instruction(message: types.Message):
-    await message.answer(text= "🧠Инструкция🧠\n\nhttps://pl.wikipedia.org/wiki/Jan_Pawe%C5%82_II")
+    await message.answer(text= f"🧠Инструкция🧠\n\n{config.FAQ_LINK}")
     
 @dp.message(F.text == "🔎Актуальные запросы🔎")
 async def actual_requests(message: types.Message):
